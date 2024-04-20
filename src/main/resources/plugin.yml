@@ -1,0 +1,4 @@
+name: ResourcePackCdn
+author: alvin0319
+main: dev.minjae.wdpe.resourcepackcdn.Loader
+version: 1.0.0
