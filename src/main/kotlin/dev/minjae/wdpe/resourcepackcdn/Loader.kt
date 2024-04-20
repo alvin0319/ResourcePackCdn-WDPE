@@ -94,7 +94,7 @@ class Loader : Plugin() {
             proceed.add(uuid.toString())
             if (cache.exists() && destination.exists()) {
                 val content = cache.readBytes().toString(StandardCharsets.UTF_8)
-                if (getFileHash(destination) == content) {
+                if (getFileHash(pack.packPath.toFile()) == content) {
                     continue
                 }
                 destination.delete()
