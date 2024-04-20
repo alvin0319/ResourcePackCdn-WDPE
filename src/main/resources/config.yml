@@ -1,2 +1,4 @@
 port: 36332
 dev: false
+
+ip: 127.0.0.1

@@ -27,18 +27,7 @@ class Loader : Plugin() {
         .registerKotlinModule()
 
     private val ip: String by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-        val client = OkHttpClient.Builder()
-            .addInterceptor(BrotliInterceptor)
-            .build()
-        client.newCall(
-            Request.Builder()
-                .url("http://ip-api.com/json")
-                .build()
-        )
-            .execute().use {
-                val data: MutableMap<String, Any> = jsonMapper.readValue(it.body.byteStream())
-                data["query"] as String
-            }
+        config.getString("ip", "127.0.0.1")
     }
 
     private val port: Int by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
