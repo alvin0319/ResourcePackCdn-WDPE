@@ -1,7 +1,6 @@
 package dev.minjae.wdpe.resourcepackcdn
 
 import com.fasterxml.jackson.module.kotlin.jsonMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import dev.waterdog.waterdogpe.event.defaults.ResourcePacksRebuildEvent
 import dev.waterdog.waterdogpe.plugin.Plugin
@@ -16,9 +15,6 @@ import java.security.MessageDigest
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.brotli.BrotliInterceptor
 import org.cloudburstmc.protocol.bedrock.packet.ResourcePacksInfoPacket.CDNEntry
 
 class Loader : Plugin() {
