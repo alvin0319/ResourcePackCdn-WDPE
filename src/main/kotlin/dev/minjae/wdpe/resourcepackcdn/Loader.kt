@@ -15,7 +15,6 @@ import java.security.MessageDigest
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
-import org.cloudburstmc.protocol.bedrock.packet.ResourcePacksInfoPacket.CDNEntry
 
 class Loader : Plugin() {
 
@@ -59,7 +58,6 @@ class Loader : Plugin() {
 
     private fun onResourcePacksRebuild(event: ResourcePacksRebuildEvent) {
         val packs = proxy.packManager.packs
-        val cdnEntries = mutableListOf<CDNEntry>()
         val proceed = mutableListOf<String>()
         val rebuilt = mutableListOf<String>()
         val cacheDir = dataFolder.resolve(".cache").apply {
@@ -67,15 +65,18 @@ class Loader : Plugin() {
                 mkdirs()
             }
         }
+        val infoEntries = proxy.packManager.packsInfoPacket.resourcePackInfos
         for ((uuid, pack) in packs) {
             val cache = cacheDir.resolve("$uuid.cache")
             val destination = cacheDir.resolve("$uuid.zip")
-            cdnEntries.add(
-                CDNEntry(
-                    "${uuid}_${pack.version}",
-                    "http://${if (dev) "127.0.0.1" else ip}:$port/$uuid.zip"
-                )
-            )
+//            cdnEntries.add(
+//                CDNEntry(
+//                    "${uuid}_${pack.version}",
+//                    "http://${if (dev) "127.0.0.1" else ip}:$port/$uuid.zip"
+//                )
+//            )
+            infoEntries.find { it.packId == uuid && it.packVersion == pack.version.toString() }
+                ?.cdnUrl = "http://${if (dev) "127.0.0.1" else ip}:$port/$uuid.zip"
             proceed.add(uuid.toString())
             if (cache.exists() && destination.exists()) {
                 val content = cache.readBytes().toString(StandardCharsets.UTF_8)
@@ -94,8 +95,8 @@ class Loader : Plugin() {
                 file.delete()
             }
         }
-        val packsInfo = proxy.packManager.packsInfoPacket
-        packsInfo.cdnEntries = cdnEntries
+        proxy.packManager.packsInfoPacket.resourcePackInfos.clear()
+        proxy.packManager.packsInfoPacket.resourcePackInfos.addAll(infoEntries)
         logger.info("${rebuilt.size}/${proceed.size} packs rebuilt")
     }
 
