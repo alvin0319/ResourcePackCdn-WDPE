@@ -34,9 +34,9 @@ dependencies {
     compileOnly("org.cloudburstmc:nbt:3.0.0.Final")
     compileOnly("org.cloudburstmc.math:immutable:2.0-SNAPSHOT")
     compileOnly("dev.waterdog.waterdogpe:waterdog:2.0.3-SNAPSHOT") {
-        exclude(group = "org.cloudburstmc.protocol", module = "bedrock-connection")
+        exclude(group = "org.cloudburstmc.protocol", module = "bedrock-codec")
     }
-    compileOnly("org.cloudburstmc.protocol:bedrock-codec:3.0.0.Beta1l5-SNAPSHOT")
+    compileOnly("org.cloudburstmc.protocol:bedrock-codec:3.0.0.Beta5-SNAPSHOT")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
     implementation("com.fasterxml.jackson.module:jackson-module-blackbird:2.16.1")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.1")
@@ -55,6 +55,10 @@ tasks {
         relocate("com.fasterxml.jackson.dataformat.yaml", "dev.minjae.wdpe.resourcepackcdn.jackson.yaml")
         relocate("com.squareup.okhttp3", "dev.minjae.wdpe.resourcepackcdn.okhttp3")
         relocate("io.javalin", "dev.minjae.wdpe.resourcepackcdn.javalin")
+
+        if (System.getenv("ARTIFACT_OUTPUT_DIR") != null) {
+            destinationDirectory.set(file(System.getenv("ARTIFACT_OUTPUT_DIR")))
+        }
     }
 }
 

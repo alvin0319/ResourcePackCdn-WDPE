@@ -66,18 +66,16 @@ class Loader : Plugin() {
             }
         }
         val infoEntries = proxy.packManager.packsInfoPacket.resourcePackInfos
-        for ((uuid, pack) in packs) {
+        var i = 0
+        for (entry in infoEntries) {
+            val uuid = entry.packId
+            val pack = packs[uuid] ?: continue
             val cache = cacheDir.resolve("$uuid.cache")
             val destination = cacheDir.resolve("$uuid.zip")
-//            cdnEntries.add(
-//                CDNEntry(
-//                    "${uuid}_${pack.version}",
-//                    "http://${if (dev) "127.0.0.1" else ip}:$port/$uuid.zip"
-//                )
-//            )
-            infoEntries.find { it.packId == uuid && it.packVersion == pack.version.toString() }
-                ?.cdnUrl = "http://${if (dev) "127.0.0.1" else ip}:$port/$uuid.zip"
+            entry.cdnUrl = "http://${if (dev) "127.0.0.1" else ip}:$port/$uuid.zip"
             proceed.add(uuid.toString())
+            proxy.packManager.packsInfoPacket.resourcePackInfos[i] = entry
+            i++
             if (cache.exists() && destination.exists()) {
                 val content = cache.readBytes().toString(StandardCharsets.UTF_8)
                 if (getFileHash(pack.packPath.toFile()) == content) {
@@ -89,15 +87,17 @@ class Loader : Plugin() {
             rebuildPack(pack.packPath, destination.toPath())
             rebuilt.add(uuid.toString())
             cache.writeText(getFileHash(destination))
+            logger.debug("Rebuilt pack {}", uuid)
         }
         for (file in cacheDir.listFiles { _, name -> name.endsWith(".cache") || name.endsWith(".zip") }!!) {
             if (file.nameWithoutExtension !in proceed) {
                 file.delete()
             }
         }
-        proxy.packManager.packsInfoPacket.resourcePackInfos.clear()
-        proxy.packManager.packsInfoPacket.resourcePackInfos.addAll(infoEntries)
         logger.info("${rebuilt.size}/${proceed.size} packs rebuilt")
+        for (pack in proxy.packManager.packsInfoPacket.resourcePackInfos) {
+            logger.debug("url: ${pack.cdnUrl}")
+        }
     }
 
     private fun rebuildPack(oldPath: Path, newPath: Path) {
